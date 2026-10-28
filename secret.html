@@ -1,0 +1,964 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дело № 002 — Секретный архив</title>
+
+<style>
+:root {
+  --bg: #080b13;
+  --panel: rgba(17, 24, 40, 0.88);
+  --gold: #d8bd82;
+  --text: #e9e7e1;
+  --muted: #9ba3b5;
+  --line: rgba(216, 189, 130, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 50% 0%, #202943 0%, transparent 48%),
+    radial-gradient(ellipse at 100% 100%, #21171e 0%, transparent 45%),
+    var(--bg);
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: 0.3px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.25;
+  background-image:
+    radial-gradient(1px 1px at 12% 17%, #fff, transparent),
+    radial-gradient(1px 1px at 72% 28%, #fff, transparent),
+    radial-gradient(1px 1px at 40% 68%, #fff, transparent),
+    radial-gradient(1px 1px at 88% 82%, #fff, transparent),
+    radial-gradient(1px 1px at 23% 91%, #fff, transparent),
+    radial-gradient(1px 1px at 61% 11%, #fff, transparent);
+  background-size: 230px 230px;
+  z-index: -1;
+}
+
+main {
+  width: min(760px, 100%);
+  margin: auto;
+  padding: 24px 18px 60px;
+}
+
+.screen {
+  display: none;
+  animation: appear 0.65s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+h1, h2, h3 {
+  font-weight: normal;
+}
+
+h1 {
+  margin: 30px 0 12px;
+  color: var(--gold);
+  font-size: clamp(30px, 7vw, 48px);
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+h2 {
+  color: var(--gold);
+  font-size: 25px;
+}
+
+h3 {
+  color: var(--gold);
+  font-size: 19px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--muted);
+  letter-spacing: 3px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.card {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.22);
+}
+
+p {
+  line-height: 1.8;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.gold {
+  color: var(--gold);
+}
+
+.center {
+  text-align: center;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 22px 0;
+}
+
+button {
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 12px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+button:hover {
+  color: var(--bg);
+  background: var(--gold);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.primary {
+  color: var(--bg);
+  background: var(--gold);
+}
+
+.primary:hover {
+  background: #f0d8a1;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 14px 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.symbol {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  height: 42px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  color: var(--gold);
+  font-size: 22px;
+}
+
+.file-info {
+  flex: 1;
+}
+
+.file-info strong {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: normal;
+}
+
+.file-info span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.status {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-align: right;
+}
+
+.option {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 13px;
+  border: 1px solid rgba(216, 189, 130, 0.22);
+  text-align: left;
+  line-height: 1.5;
+}
+
+.option.selected {
+  border-color: var(--gold);
+  background: rgba(216, 189, 130, 0.1);
+}
+
+input {
+  width: 100%;
+  margin: 12px 0;
+  padding: 14px;
+  color: var(--text);
+  background: #0a0e18;
+  border: 1px solid var(--line);
+  outline: none;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+input:focus {
+  border-color: var(--gold);
+}
+
+.notice {
+  padding: 15px;
+  border-left: 2px solid var(--gold);
+  color: var(--muted);
+  background: rgba(216, 189, 130, 0.04);
+  line-height: 1.7;
+  font-size: 13px;
+}
+
+.stamp {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  letter-spacing: 2px;
+  font-size: 10px;
+  transform: rotate(-2deg);
+}
+
+.rose {
+  font-size: 64px;
+  text-align: center;
+  margin: 12px 0;
+  filter: drop-shadow(0 0 16px rgba(180, 30, 55, 0.25));
+}
+
+.quote {
+  margin: 22px 0;
+  color: var(--gold);
+  font-size: 20px;
+  line-height: 1.7;
+  font-style: italic;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 36px;
+  text-align: center;
+  color: #687083;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+.toast {
+  display: none;
+  margin-top: 12px;
+  color: var(--gold);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.toast.show {
+  display: block;
+}
+
+.progress {
+  height: 2px;
+  margin-top: 18px;
+  background: rgba(255,255,255,0.08);
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 18px 14px 40px;
+  }
+
+  .card {
+    padding: 19px;
+  }
+
+  .file {
+    padding: 13px;
+    gap: 11px;
+  }
+
+  .symbol {
+    flex-basis: 36px;
+    height: 36px;
+  }
+
+  .topline {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+}
+</style>
+</head>
+
+<body>
+<main>
+
+  <div class="topline">
+    <span>Архив закрытых дел</span>
+    <span>Уровень доступа: II</span>
+  </div>
+
+  <!-- ВСТУПЛЕНИЕ -->
+  <section id="intro" class="screen active">
+    <h1>СЕКРЕТНЫЙ АРХИВ</h1>
+    <div class="subtitle">Материалы дела № 002</div>
+
+    <div class="card">
+      <p class="gold center">ДОСТУП К МАТЕРИАЛАМ РАЗРЕШЁН</p>
+
+      <div class="divider"></div>
+
+      <p>
+        В архив поступило новое дело. Его обстоятельства
+        до сих пор остаются не до конца ясными.
+      </p>
+
+      <p>
+        Известно лишь, что неизвестный источник оставил
+        несколько следов. Каждый из них может оказаться
+        важнее, чем кажется на первый взгляд.
+      </p>
+
+      <p>
+        Ваша задача — изучить материалы, сопоставить улики
+        и попытаться установить личность автора.
+      </p>
+
+      <div class="notice">
+        Внимание: некоторые детали могут иметь скрытый смысл.
+        Не спешите с выводами.
+      </div>
+
+      <button class="primary" onclick="showScreen('archive')">
+        ОТКРЫТЬ ДЕЛО
+      </button>
+    </div>
+
+    <div class="footer">ДЕЛО № 002 · ДОСТУП ОГРАНИЧЕН</div>
+  </section>
+
+  <!-- АРХИВ -->
+  <section id="archive" class="screen">
+    <h1>МАТЕРИАЛЫ ДЕЛА</h1>
+    <div class="subtitle">Выберите файл для изучения</div>
+
+    <div class="card">
+      <div class="file">
+        <div class="symbol">✦</div>
+        <div class="file-info">
+          <strong>Файл № 01 — Мотив</strong>
+          <span>Предполагаемая причина</span>
+        </div>
+        <div class="status" id="status1">НЕ ИЗУЧЕН</div>
+      </div>
+      <button onclick="openFile(1)">ИЗУЧИТЬ ФАЙЛ</button>
+
+      <div class="file">
+        <div class="symbol">☾</div>
+        <div class="file-info">
+          <strong>Файл № 02 — Между строк</strong>
+          <span>Скрытые детали</span>
+        </div>
+        <div class="status" id="status2">НЕ ИЗУЧЕН</div>
+      </div>
+      <button onclick="openFile(2)">ИЗУЧИТЬ ФАЙЛ</button>
+
+      <div class="file">
+        <div class="symbol">•</div>
+        <div class="file-info">
+          <strong>Файл № 03 — След</strong>
+          <span>Последняя зацепка</span>
+        </div>
+        <div class="status" id="status3">НЕ ИЗУЧЕН</div>
+      </div>
+      <button onclick="openFile(3)">ИЗУЧИТЬ ФАЙЛ</button>
+
+      <div class="divider"></div>
+
+      <p class="muted small">
+        Изучено файлов: <span id="counter">0</span> из 3
+      </p>
+
+      <div class="progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <button id="puzzleButton" class="primary" onclick="showScreen('puzzle')" disabled>
+        ПЕРЕЙТИ К СОПОСТАВЛЕНИЮ УЛИК
+      </button>
+
+      <div class="toast" id="archiveToast"></div>
+    </div>
+
+    <div class="footer">НЕ ВСЕ СЛЕДЫ ОСТАВЛЯЮТ СЛУЧАЙНО</div>
+  </section>
+
+  <!-- ФАЙЛ 1 -->
+  <section id="file1" class="screen">
+    <div class="subtitle">Материал № 01</div>
+    <h1>МОТИВ</h1>
+
+    <div class="card">
+      <p class="muted small">ФРАГМЕНТ ИЗ ДОСЬЕ</p>
+
+      <p>
+        Иногда люди делают что-то не ради благодарности
+        или признания.
+      </p>
+
+      <p>
+        Иногда им просто хочется подарить другому человеку
+        эмоцию, которая останется с ним даже после того,
+        как сам момент закончится.
+      </p>
+
+      <div class="divider"></div>
+
+      <p class="gold center">
+        Зафиксировать материал как изученный?
+      </p>
+
+      <button class="primary" onclick="markStudied(1)">
+        МАТЕРИАЛ ИЗУЧЕН
+      </button>
+      <button onclick="showScreen('archive')">
+        ВЕРНУТЬСЯ К ДЕЛУ
+      </button>
+    </div>
+  </section>
+
+  <!-- ФАЙЛ 2 -->
+  <section id="file2" class="screen">
+    <div class="subtitle">Материал № 02</div>
+    <h1>МЕЖДУ СТРОК</h1>
+
+    <div class="card">
+      <p>
+        В материалах обнаружен вопрос, на который
+        невозможно дать единственный точный ответ.
+      </p>
+
+      <p class="gold">
+        Что помогает заметить то, о чём не говорят напрямую?
+      </p>
+
+      <button class="option" onclick="chooseOption(this)">
+        Время
+      </button>
+      <button class="option" onclick="chooseOption(this)">
+        Внимание к деталям
+      </button>
+      <button class="option" onclick="chooseOption(this)">
+        Случайность
+      </button>
+
+      <div id="optionMessage" class="toast">
+        Ответ зафиксирован. Иногда важнее не сам ответ,
+        а то, как человек пришёл к нему.
+      </div>
+
+      <button id="file2Done" class="primary" onclick="markStudied(2)" disabled>
+        ЗАФИКСИРОВАТЬ ОТВЕТ
+      </button>
+
+      <button onclick="showScreen('archive')">
+        ВЕРНУТЬСЯ К ДЕЛУ
+      </button>
+    </div>
+  </section>
+
+  <!-- ФАЙЛ 3 -->
+  <section id="file3" class="screen">
+    <div class="subtitle">Материал № 03</div>
+    <h1>СЛЕД</h1>
+
+    <div class="card">
+      <p>
+        Последний фрагмент содержит загадку.
+        Ответ может показаться простым, но без него
+        расследование не продвинется дальше.
+      </p>
+
+      <div class="quote">
+        Что остаётся с нами,<br>
+        даже когда момент уже прошёл?
+      </div>
+
+      <input
+        id="riddleAnswer"
+        type="text"
+        placeholder="Введите ответ..."
+        autocomplete="off"
+      >
+
+      <button class="primary" onclick="checkRiddle()">
+        ПРОВЕРИТЬ ОТВЕТ
+      </button>
+
+      <div id="riddleMessage" class="toast"></div>
+
+      <button onclick="showScreen('archive')">
+        ВЕРНУТЬСЯ К ДЕЛУ
+      </button>
+    </div>
+  </section>
+
+  <!-- ЗАГАДКА С СИМВОЛАМИ -->
+  <section id="puzzle" class="screen">
+    <div class="subtitle">Этап сопоставления</div>
+    <h1>КОД УЛИК</h1>
+
+    <div class="card">
+      <p>
+        Все три материала содержат символы.
+        По отдельности они ничего не объясняют,
+        но в правильной последовательности могут
+        открыть следующий фрагмент дела.
+      </p>
+
+      <p class="gold center">
+        Укажите символы в порядке изучения файлов
+      </p>
+
+      <div class="divider"></div>
+
+      <label for="symbol1" class="muted small">ПЕРВЫЙ СИМВОЛ</label>
+      <select id="symbol1">
+        <option value="">Выберите символ</option>
+        <option value="✦">✦</option>
+        <option value="☾">☾</option>
+        <option value="•">•</option>
+      </select>
+
+      <label for="symbol2" class="muted small">ВТОРОЙ СИМВОЛ</label>
+      <select id="symbol2">
+        <option value="">Выберите символ</option>
+        <option value="✦">✦</option>
+        <option value="☾">☾</option>
+        <option value="•">•</option>
+      </select>
+
+      <label for="symbol3" class="muted small">ТРЕТИЙ СИМВОЛ</label>
+      <select id="symbol3">
+        <option value="">Выберите символ</option>
+        <option value="✦">✦</option>
+        <option value="☾">☾</option>
+        <option value="•">•</option>
+      </select>
+
+      <style>
+        select {
+          width: 100%;
+          padding: 13px;
+          margin: 8px 0 18px;
+          background: #0a0e18;
+          border: 1px solid var(--line);
+          color: var(--text);
+          font-family: Georgia, serif;
+          font-size: 16px;
+        }
+      </style>
+
+      <button class="primary" onclick="checkCode()">
+        РАСШИФРОВАТЬ ПОСЛЕДОВАТЕЛЬНОСТЬ
+      </button>
+
+      <div id="codeMessage" class="toast"></div>
+
+      <button onclick="showScreen('archive')">
+        ВЕРНУТЬСЯ К МАТЕРИАЛАМ
+      </button>
+    </div>
+  </section>
+
+  <!-- РАСКРЫТИЕ ПОДСКАЗКИ -->
+  <section id="clue" class="screen">
+    <div class="subtitle">Сопоставление завершено</div>
+    <h1>НОВАЯ ЗАЦЕПКА</h1>
+
+    <div class="card">
+      <div class="stamp">СЕКРЕТНО</div>
+
+      <p class="gold center">
+        ИСТОЧНИК МОЖЕТ БЫТЬ БЛИЖЕ, ЧЕМ КАЖЕТСЯ
+      </p>
+
+      <div class="divider"></div>
+
+      <p>
+        Иногда тот, кто оставляет след, не появляется
+        случайно на твоём пути.
+      </p>
+
+      <p>
+        Возможно, вы уже знакомы.
+      </p>
+
+      <p>
+        Возможно, некоторые моменты, которые кажутся
+        обычными, для кого-то значат немного больше.
+      </p>
+
+      <p class="muted">
+        Но пока это лишь версия.
+      </p>
+
+      <button class="primary" onclick="showScreen('identity')">
+        ПРОДОЛЖИТЬ РАССЛЕДОВАНИЕ
+      </button>
+    </div>
+  </section>
+
+  <!-- ЛИЧНОСТЬ НЕ УСТАНОВЛЕНА -->
+  <section id="identity" class="screen">
+    <div class="subtitle">Заключение по делу № 002</div>
+    <h1>ЛИЧНОСТЬ<br>НЕ УСТАНОВЛЕНА</h1>
+
+    <div class="card">
+      <p class="center">
+        На данный момент собранных материалов
+        недостаточно для официального установления
+        личности неизвестного автора.
+      </p>
+
+      <div class="quote">
+        Иногда самое интересное —<br>
+        не кто оставил след,<br>
+        а зачем.
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="muted center small">
+        Однако в ходе расследования обнаружены
+        дополнительные материалы, не включённые
+        в основное досье.
+      </p>
+
+      <button class="primary" onclick="showScreen('supplement')">
+        ОТКРЫТЬ ДОПОЛНЕНИЕ К ДЕЛУ
+      </button>
+    </div>
+  </section>
+
+  <!-- ШОКОЛАД И РОЗА -->
+  <section id="supplement" class="screen">
+    <div class="subtitle">Дополнительные материалы</div>
+    <h1>СЛУЖЕБНЫЙ ПАЁК</h1>
+
+    <div class="card">
+      <div class="center" style="font-size: 48px;">🍫</div>
+
+      <p class="gold center">
+        СРЕДСТВО ПОДДЕРЖКИ МЫСЛИТЕЛЬНЫХ ПРОЦЕССОВ
+      </p>
+
+      <div class="divider"></div>
+
+      <p>
+        В ходе расследования установлено, что процесс
+        распознавания личности неизвестного автора
+        может потребовать повышенной умственной активности.
+      </p>
+
+      <p>
+        В связи с этим к материалам дела прилагается
+        шоколадное средство поддержки мыслительных процессов.
+      </p>
+
+      <div class="notice">
+        <strong>Назначение:</strong><br>
+        Поддержание мыслительной активности при
+        установлении личности автора.
+        <br><br>
+        <strong>Рекомендация:</strong><br>
+        Принимать во время расследования,
+        особенно в моменты, когда улики не складываются
+        в единую картину.
+      </div>
+
+      <p class="center gold small" style="margin-top: 20px;">
+        ОДОБРЕНО СЕКРЕТНЫМ АРХИВОМ
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="rose">🌹</div>
+
+      <p class="gold center">
+        ДОПОЛНИТЕЛЬНАЯ УЛИКА
+      </p>
+
+      <p>
+        Одна красная роза — потому что даже среди
+        самых прекрасных цветов есть та, чья элегантность
+        и красота заставляют задержать взгляд.
+      </p>
+
+      <p class="quote">
+        Но, пожалуй, даже самой прекрасной розе
+        есть у кого поучиться элегантности.
+      </p>
+
+      <p class="muted small center">
+        Причина включения данной улики в материалы дела
+        пока официально не установлена.
+      </p>
+
+      <div class="divider"></div>
+
+      <p class="muted small center">
+        P.S. Содержимое пайка не гарантирует раскрытия
+        личности автора, но может повысить боевой дух
+        следователя.
+      </p>
+
+      <button class="primary" onclick="showScreen('ending')">
+        ЗАКРЫТЬ МАТЕРИАЛЫ ДЕЛА
+      </button>
+    </div>
+  </section>
+
+  <!-- ФИНАЛ -->
+  <section id="ending" class="screen">
+    <div class="subtitle">Архивная запись</div>
+    <h1>ДЕЛО ЗАКРЫТО</h1>
+
+    <div class="card">
+      <p class="center">
+        Материалы сохранены.
+      </p>
+
+      <p class="center">
+        Личность автора остаётся неизвестной.
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="quote">
+        Некоторые истории интересны именно потому,
+        что их финал ещё не написан.
+      </div>
+
+      <p class="muted center small">
+        Возможно, это не конец расследования.
+        Возможно, это только начало.
+      </p>
+
+      <div class="divider"></div>
+
+      <p class="gold center">ДЕЛО № 002</p>
+
+      <p class="center muted small">
+        СЕКРЕТНЫЙ АРХИВ · КОНЕЦ ЗАПИСИ
+      </p>
+
+      <button onclick="showScreen('intro')">
+        ПЕРЕСМОТРЕТЬ ДЕЛО
+      </button>
+
+      <button onclick="chapterThree()">
+        ДЕЛО № 003
+      </button>
+
+      <div id="chapterMessage" class="toast"></div>
+    </div>
+  </section>
+
+  <div class="footer">
+    SECRET ARCHIVE · FILE 002
+  </div>
+
+</main>
+
+<script>
+const studied = {
+  1: false,
+  2: false,
+  3: false
+};
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.remove("active");
+  });
+
+  const target = document.getElementById(id);
+
+  if (target) {
+    target.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+function openFile(number) {
+  showScreen("file" + number);
+}
+
+function markStudied(number) {
+  studied[number] = true;
+
+  const status = document.getElementById("status" + number);
+  status.textContent = "ИЗУЧЕН ✓";
+  status.style.color = "var(--gold)";
+
+  const count = Object.values(studied).filter(Boolean).length;
+  document.getElementById("counter").textContent = count;
+  document.getElementById("progressFill").style.width =
+    (count / 3 * 100) + "%";
+
+  const puzzleButton = document.getElementById("puzzleButton");
+  puzzleButton.disabled = count < 3;
+
+  if (count === 3) {
+    document.getElementById("archiveToast").textContent =
+      "Все материалы изучены. Доступен этап сопоставления улик.";
+    document.getElementById("archiveToast").classList.add("show");
+  }
+
+  showScreen("archive");
+}
+
+function chooseOption(button) {
+  document.querySelectorAll("#file2 .option").forEach(option => {
+    option.classList.remove("selected");
+  });
+
+  button.classList.add("selected");
+
+  document.getElementById("optionMessage").classList.add("show");
+  document.getElementById("file2Done").disabled = false;
+}
+
+function checkRiddle() {
+  const answer = document.getElementById("riddleAnswer")
+    .value.trim().toLowerCase().replace(/ё/g, "е");
+
+  const message = document.getElementById("riddleMessage");
+
+  const acceptedAnswers = [
+    "воспоминание",
+    "воспоминания",
+    "память",
+    "воспоминания"
+  ];
+
+  if (acceptedAnswers.includes(answer)) {
+    message.textContent =
+      "Ответ принят. Материал успешно расшифрован.";
+    message.style.color = "var(--gold)";
+    message.classList.add("show");
+
+    setTimeout(() => markStudied(3), 800);
+  } else {
+    message.textContent =
+      "Ответ не совпадает с архивной записью. Попробуйте ещё раз.";
+    message.style.color = "#d99b9b";
+    message.classList.add("show");
+  }
+}
+
+function checkCode() {
+  const first = document.getElementById("symbol1").value;
+  const second = document.getElementById("symbol2").value;
+  const third = document.getElementById("symbol3").value;
+
+  const message = document.getElementById("codeMessage");
+
+  if (!first || !second || !third) {
+    message.textContent =
+      "Необходимо указать все три символа.";
+    message.style.color = "#d99b9b";
+    message.classList.add("show");
+    return;
+  }
+
+  if (first === "✦" && second === "☾" && third === "•") {
+    message.textContent = "Последовательность верна. Доступ открыт.";
+    message.style.color = "var(--gold)";
+    message.classList.add("show");
+
+    setTimeout(() => showScreen("clue"), 900);
+  } else {
+    message.textContent =
+      "Последовательность не распознана. Проверьте порядок символов.";
+    message.style.color = "#d99b9b";
+    message.classList.add("show");
+  }
+}
+
+function chapterThree() {
+  const message = document.getElementById("chapterMessage");
+
+  message.textContent =
+    "Дело № 003 пока закрыто. Для доступа требуется новая улика...";
+  message.classList.add("show");
+}
+</script>
+
+</body>
+</html>
